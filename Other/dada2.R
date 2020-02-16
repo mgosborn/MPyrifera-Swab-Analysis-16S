@@ -1,4 +1,7 @@
 #This was built using https://benjjneb.github.io/dada2/tutorial.html
+#This is not efficient for large file sizes, even when running on the cluster
+#This work was redone using qiime2 on the cluster
+
 
 setwd('/staging/sn1/mgosborn/fulltest/PairedReads/dada2')
 print("Set working directory to /staging/sn1/mgosborn/fulltest/PairedReads/dada2")
