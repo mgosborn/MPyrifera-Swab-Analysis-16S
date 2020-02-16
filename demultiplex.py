@@ -1,3 +1,5 @@
+# This is modified from https://github.com/levisimons/oysterGut/blob/master/demultiplex.py
+
 import os,re,sys
 import gzip
 
