@@ -1,4 +1,5 @@
 # This is modified from https://github.com/levisimons/oysterGut/blob/master/demultiplex.py
+#This script will take two input files (fwd and rev reads), trim primer sequences, and demultiplex into per sample reads.
 
 import os,re,sys
 import gzip
@@ -7,6 +8,7 @@ lineNum=1
 
 print("Starting...")
 
+#Create barcode and index libraries. 
 barcode515F = ['TCAGC','GTATC','GCTAC','ACGCA','CGCGT','CTGGT','GCGTT','GGAAC','AAGCC','AGCTT','CCCTT','CGCAC','GGTGT','GGCAG','TGATA','TGTGC']
 # barcode is found in line 2 of fwd fastq (_1.fq) file (characters 5-9)
 index926R = ['CGTGAT', 'ACATCG','GCCTAA','TGGTCA','CACTGT','ATTGGC','GATCTG','TCAAGT','TGACAT','GGACGG','GCGGAC','TTTCAC','CCGGTG','ATCGTG','TGAGTG','CGCCTG']
@@ -25,6 +27,7 @@ UndeterminedRevFileName = ''.join(UndeterminedRevFileName)
 fwdIndex = 'Blank'
 revIndex = 'Blank'
 
+#Read in fwd and rev reads
 fwdRead = open('small_MO_1_paired.fq')
 revRead = open('small_MO_2_paired.fq')
 
@@ -43,6 +46,7 @@ for fwdLine, revLine in zip(fwdRead, revRead):
         #print(revIdentifier)
         #print(revIndex)
     if lineNum%4 == 2:
+        # Read in the sequence
         fwdIndex=fwdLine[4:9]
         fwdSequence=fwdLine[28:]
         #print(fwdLine)
@@ -53,8 +57,10 @@ for fwdLine, revLine in zip(fwdRead, revRead):
         fwdQI = str(fwdLine)
         revQI = str(revLine)
     if lineNum%4 == 0:
+        #Read in quality scores
         fwdQuality = fwdLine[28:]
         revQuality = revLine[20:]
+        #make sure that fwd and rev indicies are in the index library. if yes, make a new file
         if fwdIndex in barcode515F:
             if revIndex in index926R:
                 fwdIndexNum = barcode515F.index(fwdIndex)+1
@@ -73,6 +79,7 @@ for fwdLine, revLine in zip(fwdRead, revRead):
                 revOutput.write(revOutputLine)
                 fwdIndex = 'Blank'
                 revIndex = 'Blank'
+            #if rev index not in library, add read to undetermined file
             else:
                 UndeterminedFwdOutput = open(UndeterminedFwdFileName,'a')
                 UndeterminedFwdOutputLine = fwdIdentifier, fwdSequence, fwdQI, fwdQuality
@@ -84,6 +91,7 @@ for fwdLine, revLine in zip(fwdRead, revRead):
                 UndeterminedRevOutput.write(UndeterminedRevOutputLine)
                 fwdIndex = 'Blank'
                 revIndex = 'Blank'
+        #if fwd index not in library, add read to undetermined file
         else:
             UndeterminedFwdOutput = open(UndeterminedFwdFileName,'a')
             UndeterminedFwdOutputLine = fwdIdentifier, fwdSequence, fwdQI, fwdQuality
